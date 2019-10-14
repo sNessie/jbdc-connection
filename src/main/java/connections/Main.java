@@ -1,7 +1,13 @@
 package connections;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+import models.ExchangeModel;
+
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static connections.Properties.*;
 
@@ -12,7 +18,8 @@ public class Main {
         //ResultSet
         //PrepareStatement
         Connection connection = createConnection();
-        query(connection, "select * from exchanges");
+        List<ExchangeModel> exchanges = query(connection, "select * from exchanges");
+        exchanges.forEach(System.out::println);
     }
 
     public static Connection createConnection() {
@@ -30,16 +37,25 @@ public class Main {
         return connection;
     }
 
-    public static void query(Connection connection, String sql) {
+    public static List<ExchangeModel> query(Connection connection, String sql) {
+        List<ExchangeModel> results = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                System.out.println(resultSet.getString(1));
+            while (resultSet.next()) {
+
+                results.add(new ExchangeModel
+                        .Builder()
+                        .id(resultSet.getInt("id"))
+                        .name(resultSet.getString("name"))
+                        .amount(new BigDecimal(resultSet.getString("amount")))
+                        .build());
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return results;
 
     }
 
