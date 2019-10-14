@@ -1,9 +1,6 @@
 package connections;
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import models.ExchangeModel;
-
-import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,8 +15,15 @@ public class Main {
         //ResultSet
         //PrepareStatement
         Connection connection = createConnection();
-        List<ExchangeModel> exchanges = query(connection, "select * from exchanges");
-        exchanges.forEach(System.out::println);
+//        List<ExchangeModel> exchanges = query(connection, "select * from exchanges");
+//        exchanges.forEach(System.out::println);
+        ExchangeModel exchangeModel = new ExchangeModel
+                .Builder()
+                .id(3)
+                .name("Bogusia")
+                .amount(new BigDecimal(1300))
+                .build();
+        insertIntoDb(connection, exchangeModel);
     }
 
     public static Connection createConnection() {
@@ -56,6 +60,22 @@ public class Main {
             e.printStackTrace();
         }
         return results;
+
+    }
+
+    public static int insertIntoDb(Connection connection, ExchangeModel record){
+        String sql = "insert into exchanges(id, name, amount) values(?, ?, ?)";
+        int result = 0;
+        // PreparedStatement in try() because then it's autoclosable
+        try(final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, record.getId());
+            preparedStatement.setString(2, record.getName());
+            preparedStatement.setBigDecimal(3, record.getAmount());
+            result = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
 
     }
 

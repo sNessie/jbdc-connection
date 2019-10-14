@@ -38,6 +38,18 @@ public class ExchangeModel {
         }
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
     @Override
     public String toString() {
         return "ExchangeModel{" +
