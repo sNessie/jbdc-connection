@@ -26,6 +26,7 @@ public class Main {
                 .build();
         insertIntoDb(connection, exchangeModel);
         deleteDatafromDb(connection,1);
+        System.out.println(getAvgAmount(connection));
     }
 
     public static Connection createConnection() {
@@ -49,7 +50,6 @@ public class Main {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-
                 results.add(new ExchangeModel
                         .Builder()
                         .id(resultSet.getInt("id"))
@@ -91,6 +91,21 @@ public class Main {
 
     }
 
+    public static double getAvgAmount (Connection connection){
+        String sql = "select avg(amount) from exchanges";
+        double result = 0;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getDouble(1);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
     public static void getDbInfo(Connection connection) {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
@@ -102,7 +117,6 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
 }
