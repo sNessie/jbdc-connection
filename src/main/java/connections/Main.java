@@ -1,6 +1,7 @@
 package connections;
 
 import models.ExchangeModel;
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,11 +20,12 @@ public class Main {
 //        exchanges.forEach(System.out::println);
         ExchangeModel exchangeModel = new ExchangeModel
                 .Builder()
-                .id(3)
+                .id(1)
                 .name("Bogusia")
                 .amount(new BigDecimal(1300))
                 .build();
         insertIntoDb(connection, exchangeModel);
+        deleteDatafromDb(connection,1);
     }
 
     public static Connection createConnection() {
@@ -63,11 +65,21 @@ public class Main {
 
     }
 
-    public static int insertIntoDb(Connection connection, ExchangeModel record){
+    public static void deleteDatafromDb(Connection connection, int id) {
+        String sql = "DELETE FROM exchanges WHERE id=?";
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int insertIntoDb(Connection connection, ExchangeModel record) {
         String sql = "insert into exchanges(id, name, amount) values(?, ?, ?)";
         int result = 0;
         // PreparedStatement in try() because then it's autoclosable
-        try(final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, record.getId());
             preparedStatement.setString(2, record.getName());
             preparedStatement.setBigDecimal(3, record.getAmount());
